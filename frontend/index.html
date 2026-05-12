@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FleteNet — Panel Principal</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --azul:#1a56db;--azul-dark:#1e3a8a;--azul-light:#eff6ff;
+      --gris:#6b7280;--gris-light:#f3f4f6;--borde:#e5e7eb;
+      --texto:#111827;--blanco:#ffffff;
+      --verde:#059669;--rojo:#dc2626;--amarillo:#d97706;
+      --sidebar:240px;
+    }
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#f9fafb;color:var(--texto);display:flex;min-height:100vh;}
+
+    /* ══ SIDEBAR ══ */
+    #sidebar{
+      width:var(--sidebar);min-width:var(--sidebar);background:linear-gradient(180deg,#1e3a8a,#1a56db);
+      display:flex;flex-direction:column;position:fixed;height:100vh;z-index:100;transition:.3s;
+    }
+    .sb-logo{padding:20px 16px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:10px;}
+    .sb-logo-icon{width:36px;height:36px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+    .sb-logo-icon svg{width:20px;height:20px;fill:#fff;}
+    .sb-logo-text h2{color:#fff;font-size:18px;font-weight:800;}
+    .sb-logo-text p{color:#bfdbfe;font-size:11px;}
+    .sb-nav{flex:1;overflow-y:auto;padding:10px 0;}
+    .sb-section{padding:10px 16px 4px;font-size:10px;font-weight:700;color:#93c5fd;text-transform:uppercase;letter-spacing:.8px;}
+    .sb-item{display:flex;align-items:center;gap:10px;padding:10px 16px;color:#bfdbfe;cursor:pointer;transition:.15s;border-radius:0;text-decoration:none;font-size:14px;}
+    .sb-item:hover{background:rgba(255,255,255,.1);color:#fff;}
+    .sb-item.activo{background:rgba(255,255,255,.2);color:#fff;font-weight:600;border-right:3px solid #fff;}
+    .sb-item svg{width:18px;height:18px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .sb-footer{padding:16px;border-top:1px solid rgba(255,255,255,.15);}
+    .sb-usuario{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .sb-avatar{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:14px;}
+    .sb-usuario-info p{color:#fff;font-size:13px;font-weight:600;}
+    .sb-usuario-info span{color:#bfdbfe;font-size:11px;}
+    .btn-salir{width:100%;padding:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-size:13px;cursor:pointer;transition:.2s;}
+    .btn-salir:hover{background:rgba(255,255,255,.2);}
+
+    /* ══ MAIN ══ */
+    #main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh;}
+    .topbar{background:#fff;border-bottom:1px solid var(--borde);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;}
+    .topbar h1{font-size:20px;font-weight:700;color:var(--texto);}
+    .topbar-acc{display:flex;align-items:center;gap:10px;}
+    .contenido{padding:28px;flex:1;}
+
+    /* ══ CARDS ══ */
+    .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:28px;}
+    .card-stat{background:#fff;border-radius:14px;padding:20px;border:1px solid var(--borde);display:flex;align-items:center;gap:14px;}
+    .card-stat-icon{width:46px;height:46px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .card-stat-icon svg{width:22px;height:22px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .card-stat-info p{font-size:22px;font-weight:800;color:var(--texto);}
+    .card-stat-info span{font-size:12px;color:var(--gris);}
+    .ic-azul{background:linear-gradient(135deg,#1a56db,#1e3a8a);}
+    .ic-verde{background:linear-gradient(135deg,#059669,#047857);}
+    .ic-amarillo{background:linear-gradient(135deg,#d97706,#b45309);}
+    .ic-rojo{background:linear-gradient(135deg,#dc2626,#b91c1c);}
+    .ic-violeta{background:linear-gradient(135deg,#7c3aed,#5b21b6);}
+    .ic-celeste{background:linear-gradient(135deg,#0ea5e9,#0284c7);}
+
+    /* ══ TABLA ══ */
+    .panel{background:#fff;border-radius:14px;border:1px solid var(--borde);overflow:hidden;margin-bottom:24px;}
+    .panel-header{padding:16px 20px;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+    .panel-header h3{font-size:16px;font-weight:700;}
+    .panel-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .tabla-wrap{overflow-x:auto;}
+    table{width:100%;border-collapse:collapse;}
+    thead th{background:var(--gris-light);padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--gris);text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+    tbody tr{border-bottom:1px solid var(--borde);transition:.15s;}
+    tbody tr:hover{background:#f9fafb;}
+    tbody tr:last-child{border-bottom:none;}
+    tbody td{padding:11px 14px;font-size:14px;color:var(--texto);}
+    .td-gris{color:var(--gris);font-size:13px;}
+
+    /* ══ BADGES ══ */
+    .badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:600;}
+    .badge-verde{background:#d1fae5;color:#065f46;}
+    .badge-azul{background:#dbeafe;color:#1e40af;}
+    .badge-amarillo{background:#fef3c7;color:#92400e;}
+    .badge-rojo{background:#fee2e2;color:#991b1b;}
+    .badge-gris{background:#f3f4f6;color:#374151;}
+
+    /* ══ BOTONES ══ */
+    .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:.2s;}
+    .btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+    .btn-primary{background:var(--azul);color:#fff;}
+    .btn-primary:hover{background:var(--azul-dark);}
+    .btn-secondary{background:var(--gris-light);color:var(--texto);border:1px solid var(--borde);}
+    .btn-secondary:hover{background:var(--borde);}
+    .btn-danger{background:#fee2e2;color:var(--rojo);}
+    .btn-danger:hover{background:#fecaca;}
+    .btn-success{background:#d1fae5;color:var(--verde);}
+    .btn-sm{padding:5px 10px;font-size:12px;}
+
+    /* ══ INPUTS ══ */
+    .input,.select{padding:9px 12px;border:2px solid var(--borde);border-radius:8px;font-size:14px;color:var(--texto);background:#fff;outline:none;transition:.2s;width:100%;}
+    .input:focus,.select:focus{border-color:var(--azul);box-shadow:0 0 0 3px rgba(26,86,219,.1);}
+    .input-sm{padding:7px 10px;font-size:13px;}
+    .busqueda{position:relative;}
+    .busqueda svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:none;stroke:var(--gris);stroke-width:2;stroke-linecap:round;}
+    .busqueda input{padding-left:34px;}
+
+    /* ══ MODAL ══ */
+    .modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
+    .modal-bg.abierto{display:flex;}
+    .modal{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,.25);}
+    .modal-header{padding:20px 24px;border-bottom:1px solid var(--borde);display:flex;align-items:center;justify-content:space-between;}
+    .modal-header h3{font-size:17px;font-weight:700;}
+    .modal-body{padding:24px;overflow-y:auto;flex:1;}
+    .modal-footer{padding:16px 24px;border-top:1px solid var(--borde);display:flex;gap:10px;justify-content:flex-end;}
+    .btn-cerrar{background:none;border:none;cursor:pointer;padding:4px;color:var(--gris);}
+    .btn-cerrar:hover{color:var(--texto);}
+    .btn-cerrar svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;}
+
+    /* ══ FORM GRID ══ */
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    .form-grid.uno{grid-template-columns:1fr;}
+    .form-campo{display:flex;flex-direction:column;gap:6px;}
+    .form-campo label{font-size:13px;font-weight:600;color:#374151;}
+    .form-campo.span2{grid-column:span 2;}
+
+    /* ══ ALERTAS ══ */
+    .alerta-msg{padding:12px 16px;border-radius:10px;font-size:14px;margin-bottom:16px;display:none;}
+    .alerta-msg.visible{display:block;}
+    .alerta-error{background:#fee2e2;color:#991b1b;border:1px solid #fecaca;}
+    .alerta-ok{background:#d1fae5;color:#065f46;border:1px solid #a7f3d0;}
+
+    /* ══ SECCIONES ══ */
+    .seccion{display:none;}
+    .seccion.activa{display:block;}
+
+    /* ══ CARGANDO ══ */
+    .cargando{text-align:center;padding:40px;color:var(--gris);}
+    .cargando svg{width:32px;height:32px;fill:none;stroke:var(--azul);stroke-width:2;animation:girar .8s linear infinite;margin-bottom:10px;}
+    @keyframes girar{to{transform:rotate(360deg)}}
+
+    /* ══ VACÍO ══ */
+    .vacio{text-align:center;padding:48px 20px;color:var(--gris);}
+    .vacio svg{width:48px;height:48px;fill:none;stroke:var(--borde);stroke-width:1.5;margin-bottom:12px;}
+    .vacio p{font-size:15px;}
+    .vacio span{font-size:13px;}
+
+    /* ══ RESPONSIVE ══ */
+    @media(max-width:768px){
+      #sidebar{transform:translateX(-100%);}
+      #sidebar.abierto{transform:translateX(0);}
+      #main{margin-left:0;}
+      .form-grid{grid-template-columns:1fr;}
+      .form-campo.span2{grid-column:span 1;}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     SIDEBAR
+══════════════════════════════════════════════════════════ -->
+<nav id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-logo-icon">
+      <svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+    </div>
+    <div class="sb-logo-text"><h2>FleteNet</h2><p>Gestión de Fletes</p></div>
+  </div>
+
+  <div class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <a class="sb-item activo" onclick="irA('dashboard')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard
+    </a>
+
+    <div class="sb-section">Operaciones</div>
+    <a class="sb-item" onclick="irA('viajes')">
+      <svg viewBox="0 0 24 24"><path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Viajes
+    </a>
+    <a class="sb-item" onclick="irA('choferes')">
+      <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Choferes
+    </a>
+    <a class="sb-item" onclick="irA('vehiculos')">
+      <svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>Vehículos
+    </a>
+
+    <div class="sb-section">Finanzas</div>
+    <a class="sb-item" onclick="irA('gastos')">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Gastos
+    </a>
+    <a class="sb-item" onclick="irA('combustible')">
+      <svg viewBox="0 0 24 24"><path d="M3 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18"/><path d="M17 15h.01"/><path d="M17 9h2a2 2 0 0 1 2 2v4"/><line x1="1" y1="22" x2="23" y2="22"/></svg>Combustible
+    </a>
+    <a class="sb-item" onclick="irA('anticipos')">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Anticipos
+    </a>
+    <a class="sb-item" onclick="irA('liquidaciones')">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Liquidaciones
+    </a>
+
+    <div class="sb-section">Maestros</div>
+    <a class="sb-item" onclick="irA('clientes')">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Clientes
+    </a>
+    <a class="sb-item" onclick="irA('proveedores')">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Proveedores
+    </a>
+    <a class="sb-item" onclick="irA('productos')">
+      <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Productos
+    </a>
+    <a class="sb-item" onclick="irA('stock')">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Stock
+    </a>
+    <a class="sb-item" id="sb-usuarios" onclick="irA('usuarios')" style="display:none">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>Usuarios
+    </a>
+  </div>
+
+  <div class="sb-footer">
+    <div class="sb-usuario">
+      <div class="sb-avatar" id="sb-avatar">A</div>
+      <div class="sb-usuario-info">
+        <p id="sb-nombre">Admin</p>
+        <span id="sb-rol">Administrador</span>
+      </div>
+    </div>
+    <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════════════════════════
+     MAIN
+══════════════════════════════════════════════════════════ -->
+<main id="main">
+  <div class="topbar">
+    <h1 id="topbar-titulo">Dashboard</h1>
+    <div class="topbar-acc">
+      <span id="topbar-fecha" style="font-size:13px;color:var(--gris)"></span>
+    </div>
+  </div>
+
+  <div class="contenido">
+
+    <!-- ── DASHBOARD ── -->
+    <section id="sec-dashboard" class="seccion activa">
+      <div class="cards-grid" id="dash-cards">
+        <div class="card-stat"><div class="card-stat-icon ic-azul"><svg viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="card-stat-info"><p id="d-viajes-hoy">-</p><span>Viajes hoy</span></div></div>
+        <div class="card-stat"><div class="card-stat-icon ic-verde"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div><div class="card-stat-info"><p id="d-choferes">-</p><span>Choferes activos</span></div></div>
+        <div class="card-stat"><div class="card-stat-icon ic-celeste"><svg viewBox="0 0 24 24"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div><div class="card-stat-info"><p id="d-vehiculos">-</p><span>Vehículos activos</span></div></div>
+        <div class="card-stat"><div class="card-stat-icon ic-amarillo"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="card-stat-info"><p id="d-facturado">-</p><span>Facturado este mes</span></div></div>
+        <div class="card-stat"><div class="card-stat-icon ic-rojo"><svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></div><div class="card-stat-info"><p id="d-gastos">-</p><span>Gastos este mes</span></div></div>
+        <div class="card-stat"><div class="card-stat-icon ic-violeta"><svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg></div><div class="card-stat-info"><p id="d-anticipos">-</p><span>Anticipos pendientes</span></div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><h3>Últimos viajes</h3><button class="btn btn-secondary btn-sm" onclick="irA('viajes')">Ver todos</button></div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nro</th><th>Fecha</th><th>Chofer</th><th>Origen → Destino</th><th>Cliente</th><th>Importe</th><th>Estado</th></tr></thead>
+          <tbody id="dash-tabla-viajes"><tr><td colspan="7" class="cargando">Cargando...</td></tr></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── VIAJES ── -->
+    <section id="sec-viajes" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Viajes</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="viajes-buscar" placeholder="Buscar..." oninput="filtrarViajes()"></div>
+            <select class="select input-sm" id="viajes-estado" onchange="filtrarViajes()" style="width:140px">
+              <option value="">Todos los estados</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="en_curso">En curso</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalViaje()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo viaje
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nro</th><th>Fecha</th><th>Chofer</th><th>Vehículo</th><th>Origen → Destino</th><th>Cliente</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="viajes-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── CHOFERES ── -->
+    <section id="sec-choferes" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Choferes</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="choferes-buscar" placeholder="Buscar..." oninput="cargarChoferes()"></div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalChofer()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo chofer
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nombre</th><th>DNI</th><th>Teléfono</th><th>Licencia</th><th>Vencimiento</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="choferes-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── VEHÍCULOS ── -->
+    <section id="sec-vehiculos" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Vehículos</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="vehiculos-buscar" placeholder="Buscar..." oninput="cargarVehiculos()"></div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalVehiculo()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo vehículo
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Patente</th><th>Marca</th><th>Modelo</th><th>Año</th><th>Tipo</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="vehiculos-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── CLIENTES ── -->
+    <section id="sec-clientes" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Clientes</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="clientes-buscar" placeholder="Buscar..." oninput="cargarClientes()"></div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalCliente()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo cliente
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Razón Social</th><th>CUIT</th><th>Teléfono</th><th>Email</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="clientes-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── PROVEEDORES ── -->
+    <section id="sec-proveedores" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Proveedores</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="proveedores-buscar" placeholder="Buscar..." oninput="cargarProveedores()"></div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalProveedor()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo proveedor
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Razón Social</th><th>CUIT</th><th>Teléfono</th><th>Rubro</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="proveedores-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── PRODUCTOS ── -->
+    <section id="sec-productos" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Productos</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="productos-buscar" placeholder="Buscar..." oninput="cargarProductos()"></div>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalProducto()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo producto
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nombre</th><th>Unidad</th><th>Descripción</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="productos-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── GASTOS ── -->
+    <section id="sec-gastos" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Gastos</h3>
+          <div class="panel-tools">
+            <div class="busqueda"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input class="input input-sm" id="gastos-buscar" placeholder="Buscar..." oninput="cargarGastos()"></div>
+            <select class="select input-sm" id="gastos-cat" onchange="cargarGastos()" style="width:140px">
+              <option value="">Todas las categorías</option>
+              <option value="combustible">Combustible</option>
+              <option value="peaje">Peaje</option>
+              <option value="comida">Comida</option>
+              <option value="alojamiento">Alojamiento</option>
+              <option value="reparacion">Reparación</option>
+              <option value="otro">Otro</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalGasto()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo gasto
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Fecha</th><th>Categoría</th><th>Chofer</th><th>Viaje</th><th>Descripción</th><th>Importe</th><th>Acciones</th></tr></thead>
+          <tbody id="gastos-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── COMBUSTIBLE ── -->
+    <section id="sec-combustible" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Combustible</h3>
+          <div class="panel-tools">
+            <button class="btn btn-primary btn-sm" onclick="abrirModalCombustible()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva carga
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Fecha</th><th>Vehículo</th><th>Viaje</th><th>Estación</th><th>Litros</th><th>Precio/Lt</th><th>Total</th><th>Acciones</th></tr></thead>
+          <tbody id="combustible-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── ANTICIPOS ── -->
+    <section id="sec-anticipos" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Anticipos</h3>
+          <div class="panel-tools">
+            <select class="select input-sm" id="anticipos-liq" onchange="cargarAnticipos()" style="width:160px">
+              <option value="">Todos</option>
+              <option value="false">Pendientes</option>
+              <option value="true">Liquidados</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalAnticipo()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo anticipo
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Fecha</th><th>Chofer</th><th>Viaje</th><th>Descripción</th><th>Importe</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="anticipos-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── LIQUIDACIONES ── -->
+    <section id="sec-liquidaciones" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Liquidaciones</h3>
+          <div class="panel-tools">
+            <select class="select input-sm" id="liq-estado" onchange="cargarLiquidaciones()" style="width:150px">
+              <option value="">Todos los estados</option>
+              <option value="borrador">Borrador</option>
+              <option value="confirmada">Confirmada</option>
+              <option value="pagada">Pagada</option>
+            </select>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalLiquidacion()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nueva liquidación
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nro</th><th>Chofer</th><th>Período</th><th>Total Fletes</th><th>%</th><th>Bruto</th><th>Descuentos</th><th>Neto</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="liquidaciones-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── STOCK ── -->
+    <section id="sec-stock" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Stock Actual</h3>
+          <div class="panel-tools">
+            <button class="btn btn-secondary btn-sm" onclick="cargarStockActual()">Actualizar</button>
+            <button class="btn btn-primary btn-sm" onclick="abrirModalStock()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Movimiento
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Producto</th><th>Unidad</th><th>Entradas</th><th>Salidas</th><th>Disponible</th><th>Precio Prom.</th></tr></thead>
+          <tbody id="stock-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ── USUARIOS ── -->
+    <section id="sec-usuarios" class="seccion">
+      <div class="panel">
+        <div class="panel-header">
+          <h3>Usuarios del sistema</h3>
+          <div class="panel-tools">
+            <button class="btn btn-primary btn-sm" onclick="abrirModalUsuario()">
+              <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Nuevo usuario
+            </button>
+          </div>
+        </div>
+        <div class="tabla-wrap"><table>
+          <thead><tr><th>Nombre</th><th>Email</th><th>Rol</th><th>Estado</th><th>Creado</th><th>Acciones</th></tr></thead>
+          <tbody id="usuarios-tabla"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+  </div><!-- /contenido -->
+</main>
+
+<!-- ══════════════════════════════════════════════════════════
+     MODALES
+══════════════════════════════════════════════════════════ -->
+
+<!-- Modal Chofer -->
+<div class="modal-bg" id="modal-chofer">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-chofer-titulo">Nuevo Chofer</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-chofer')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-chofer"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Nombre completo *</label><input class="input" id="ch-nombre" placeholder="Juan Pérez"></div>
+        <div class="form-campo"><label>DNI *</label><input class="input" id="ch-dni" placeholder="30123456"></div>
+        <div class="form-campo"><label>Teléfono</label><input class="input" id="ch-tel" placeholder="3434000000"></div>
+        <div class="form-campo"><label>Nro. Licencia</label><input class="input" id="ch-lic" placeholder="B1234567"></div>
+        <div class="form-campo"><label>Venc. Licencia</label><input class="input" type="date" id="ch-venc"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-chofer')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarChofer()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Vehículo -->
+<div class="modal-bg" id="modal-vehiculo">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-vehiculo-titulo">Nuevo Vehículo</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-vehiculo')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-vehiculo"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Patente *</label><input class="input" id="ve-patente" placeholder="ABC123"></div>
+        <div class="form-campo"><label>Tipo</label>
+          <select class="select" id="ve-tipo"><option value="camion">Camión</option><option value="semi">Semi</option><option value="utilitario">Utilitario</option></select>
+        </div>
+        <div class="form-campo"><label>Marca</label><input class="input" id="ve-marca" placeholder="Mercedes"></div>
+        <div class="form-campo"><label>Modelo</label><input class="input" id="ve-modelo" placeholder="Actros"></div>
+        <div class="form-campo"><label>Año</label><input class="input" type="number" id="ve-anio" placeholder="2020"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-vehiculo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarVehiculo()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Cliente -->
+<div class="modal-bg" id="modal-cliente">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-cliente-titulo">Nuevo Cliente</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-cliente')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-cliente"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Razón Social *</label><input class="input" id="cl-razon" placeholder="Empresa S.A."></div>
+        <div class="form-campo"><label>CUIT</label><input class="input" id="cl-cuit" placeholder="20-12345678-9"></div>
+        <div class="form-campo"><label>Teléfono</label><input class="input" id="cl-tel" placeholder="3434000000"></div>
+        <div class="form-campo"><label>Email</label><input class="input" id="cl-email" placeholder="contacto@empresa.com"></div>
+        <div class="form-campo"><label>Dirección</label><input class="input" id="cl-dir" placeholder="Av. Siempreviva 123"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-cliente')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCliente()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Proveedor -->
+<div class="modal-bg" id="modal-proveedor">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-proveedor-titulo">Nuevo Proveedor</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-proveedor')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-proveedor"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Razón Social *</label><input class="input" id="pv-razon" placeholder="Proveedor S.R.L."></div>
+        <div class="form-campo"><label>CUIT</label><input class="input" id="pv-cuit" placeholder="20-12345678-9"></div>
+        <div class="form-campo"><label>Teléfono</label><input class="input" id="pv-tel" placeholder="3434000000"></div>
+        <div class="form-campo"><label>Email</label><input class="input" id="pv-email" placeholder="info@proveedor.com"></div>
+        <div class="form-campo"><label>Rubro</label><input class="input" id="pv-rubro" placeholder="Combustible / Repuestos..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-proveedor')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarProveedor()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Producto -->
+<div class="modal-bg" id="modal-producto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-producto-titulo">Nuevo Producto</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-producto')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-producto"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Nombre *</label><input class="input" id="pr-nombre" placeholder="Soja / Maíz / Cemento..."></div>
+        <div class="form-campo"><label>Unidad</label>
+          <select class="select" id="pr-unidad">
+            <option value="kg">kg</option><option value="tn">tn</option>
+            <option value="lt">lt</option><option value="m3">m3</option>
+            <option value="unidad">unidad</option><option value="bolsa">bolsa</option>
+            <option value="pallet">pallet</option><option value="otro">otro</option>
+          </select>
+        </div>
+        <div class="form-campo span2"><label>Descripción</label><input class="input" id="pr-desc" placeholder="Descripción opcional"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-producto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarProducto()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Viaje -->
+<div class="modal-bg" id="modal-viaje">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h3 id="modal-viaje-titulo">Nuevo Viaje</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-viaje')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-viaje"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Fecha *</label><input class="input" type="date" id="vj-fecha"></div>
+        <div class="form-campo"><label>Estado</label>
+          <select class="select" id="vj-estado"><option value="pendiente">Pendiente</option><option value="en_curso">En curso</option><option value="completado">Completado</option><option value="cancelado">Cancelado</option></select>
+        </div>
+        <div class="form-campo"><label>Chofer *</label><select class="select" id="vj-chofer"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Vehículo *</label><select class="select" id="vj-vehiculo"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Cliente *</label><select class="select" id="vj-cliente"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Producto</label><select class="select" id="vj-producto"><option value="">Sin producto</option></select></div>
+        <div class="form-campo"><label>Origen</label><input class="input" id="vj-origen" placeholder="Ciudad origen"></div>
+        <div class="form-campo"><label>Destino</label><input class="input" id="vj-destino" placeholder="Ciudad destino"></div>
+        <div class="form-campo"><label>KM Estimados</label><input class="input" type="number" id="vj-km-est" placeholder="0"></div>
+        <div class="form-campo"><label>KM Reales</label><input class="input" type="number" id="vj-km-real" placeholder="0"></div>
+        <div class="form-campo"><label>Peso carga (kg)</label><input class="input" type="number" id="vj-peso" placeholder="0"></div>
+        <div class="form-campo"><label>Importe flete $</label><input class="input" type="number" id="vj-importe" placeholder="0.00"></div>
+        <div class="form-campo span2"><label>Observaciones</label><input class="input" id="vj-obs" placeholder="Notas del viaje..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-viaje')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarViaje()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Gasto -->
+<div class="modal-bg" id="modal-gasto">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-gasto-titulo">Nuevo Gasto</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-gasto')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-gasto"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Fecha *</label><input class="input" type="date" id="gs-fecha"></div>
+        <div class="form-campo"><label>Categoría *</label>
+          <select class="select" id="gs-cat">
+            <option value="combustible">Combustible</option><option value="peaje">Peaje</option>
+            <option value="comida">Comida</option><option value="alojamiento">Alojamiento</option>
+            <option value="reparacion">Reparación</option><option value="otro">Otro</option>
+          </select>
+        </div>
+        <div class="form-campo"><label>Chofer</label><select class="select" id="gs-chofer"><option value="">Sin chofer</option></select></div>
+        <div class="form-campo"><label>Viaje</label><select class="select" id="gs-viaje"><option value="">Sin viaje</option></select></div>
+        <div class="form-campo span2"><label>Descripción</label><input class="input" id="gs-desc" placeholder="Detalle del gasto..."></div>
+        <div class="form-campo"><label>Importe $ *</label><input class="input" type="number" id="gs-importe" placeholder="0.00"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-gasto')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarGasto()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Combustible -->
+<div class="modal-bg" id="modal-combustible">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nueva Carga de Combustible</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-combustible')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-combustible"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Fecha *</label><input class="input" type="date" id="cb-fecha"></div>
+        <div class="form-campo"><label>Vehículo *</label><select class="select" id="cb-vehiculo"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Litros *</label><input class="input" type="number" id="cb-litros" placeholder="0.00" oninput="calcularTotalComb()"></div>
+        <div class="form-campo"><label>Precio por litro $ *</label><input class="input" type="number" id="cb-precio" placeholder="0.00" oninput="calcularTotalComb()"></div>
+        <div class="form-campo"><label>Total $</label><input class="input" id="cb-total" placeholder="0.00" readonly style="background:#f9fafb"></div>
+        <div class="form-campo"><label>Estación</label><input class="input" id="cb-estacion" placeholder="YPF Paraná..."></div>
+        <div class="form-campo span2"><label>Viaje asociado</label><select class="select" id="cb-viaje"><option value="">Sin viaje</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-combustible')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarCombustible()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Anticipo -->
+<div class="modal-bg" id="modal-anticipo">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Nuevo Anticipo</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-anticipo')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-anticipo"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Fecha *</label><input class="input" type="date" id="an-fecha"></div>
+        <div class="form-campo"><label>Chofer *</label><select class="select" id="an-chofer"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Importe $ *</label><input class="input" type="number" id="an-importe" placeholder="0.00"></div>
+        <div class="form-campo"><label>Viaje asociado</label><select class="select" id="an-viaje"><option value="">Sin viaje</option></select></div>
+        <div class="form-campo span2"><label>Descripción</label><input class="input" id="an-desc" placeholder="Motivo del anticipo..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-anticipo')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarAnticipo()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Liquidación -->
+<div class="modal-bg" id="modal-liquidacion">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <h3>Nueva Liquidación</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-liquidacion')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-liq"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Chofer *</label><select class="select" id="lq-chofer"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Fecha desde *</label><input class="input" type="date" id="lq-desde"></div>
+        <div class="form-campo"><label>Fecha hasta *</label><input class="input" type="date" id="lq-hasta"></div>
+        <div class="form-campo"><label>Porcentaje chofer % *</label><input class="input" type="number" id="lq-porc" placeholder="30"></div>
+        <div class="form-campo span2"><label>Observaciones</label><input class="input" id="lq-obs" placeholder="Notas opcionales..."></div>
+        <div class="form-campo span2">
+          <label>Viajes a incluir *</label>
+          <div id="lq-viajes-lista" style="border:2px solid var(--borde);border-radius:8px;padding:10px;max-height:180px;overflow-y:auto;background:#f9fafb;font-size:13px">
+            <span style="color:var(--gris)">Seleccione chofer y período primero</span>
+          </div>
+          <button class="btn btn-secondary btn-sm" style="margin-top:8px" onclick="buscarViajesLiquidacion()">Buscar viajes del período</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-liquidacion')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarLiquidacion()">Generar liquidación</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Stock -->
+<div class="modal-bg" id="modal-stock">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Movimiento de Stock</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-stock')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-stock"></div>
+      <div class="form-grid">
+        <div class="form-campo"><label>Tipo *</label>
+          <select class="select" id="sk-tipo"><option value="entrada">Entrada</option><option value="salida">Salida</option></select>
+        </div>
+        <div class="form-campo"><label>Fecha *</label><input class="input" type="date" id="sk-fecha"></div>
+        <div class="form-campo"><label>Producto *</label><select class="select" id="sk-producto"><option value="">Seleccionar...</option></select></div>
+        <div class="form-campo"><label>Proveedor</label><select class="select" id="sk-proveedor"><option value="">Sin proveedor</option></select></div>
+        <div class="form-campo"><label>Cantidad *</label><input class="input" type="number" id="sk-cantidad" placeholder="0"></div>
+        <div class="form-campo"><label>Precio unitario $</label><input class="input" type="number" id="sk-precio" placeholder="0.00"></div>
+        <div class="form-campo span2"><label>Referencia</label><input class="input" id="sk-ref" placeholder="Nro factura, remito..."></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-stock')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarStock()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Usuario -->
+<div class="modal-bg" id="modal-usuario">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modal-usuario-titulo">Nuevo Usuario</h3>
+      <button class="btn-cerrar" onclick="cerrarModal('modal-usuario')"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="alerta-msg alerta-error" id="err-usuario"></div>
+      <div class="form-grid">
+        <div class="form-campo span2"><label>Nombre *</label><input class="input" id="us-nombre" placeholder="Nombre completo"></div>
+        <div class="form-campo span2"><label>Email *</label><input class="input" type="email" id="us-email" placeholder="correo@ejemplo.com"></div>
+        <div class="form-campo"><label>Contraseña *</label><input class="input" type="password" id="us-pass" placeholder="Mínimo 4 caracteres"></div>
+        <div class="form-campo"><label>Rol</label>
+          <select class="select" id="us-rol"><option value="operador">Operador</option><option value="admin">Administrador</option><option value="chofer">Chofer</option></select>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="cerrarModal('modal-usuario')">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarUsuario()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════
+     JAVASCRIPT
+══════════════════════════════════════════════════════════ -->
+<script>
+const API     = 'http://localhost:3000/api';
+const token   = localStorage.getItem('fn_token');
+const usuario = JSON.parse(localStorage.getItem('fn_usuario') || '{}');
+
+// ── Verificar sesión ──────────────────────────────────────────
+if (!token) window.location.href = '/login.html';
+
+// ── Config usuario en sidebar ─────────────────────────────────
+document.getElementById('sb-nombre').textContent = usuario.nombre || 'Usuario';
+document.getElementById('sb-rol').textContent    = usuario.rol    || '';
+document.getElementById('sb-avatar').textContent = (usuario.nombre || 'U')[0].toUpperCase();
+if (usuario.rol === 'admin') document.getElementById('sb-usuarios').style.display = 'flex';
+
+// Fecha en topbar
+document.getElementById('topbar-fecha').textContent =
+  new Date().toLocaleDateString('es-AR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+// ── Helpers ───────────────────────────────────────────────────
+const h = (url, opts={}) => fetch(`${API}${url}`, {
+  ...opts,
+  headers: { 'Authorization': `Bearer ${token}`, 'Content-Type':'application/json', ...(opts.headers||{}) }
+}).then(r => r.json());
+
+const $  = id => document.getElementById(id);
+const fm = v => v != null ? `$ ${Number(v).toLocaleString('es-AR',{minimumFractionDigits:2})}` : '-';
+const fd = v => v ? v.split('-').reverse().join('/') : '-';
+
+const estadoBadge = e => {
+  const m = { pendiente:'badge-amarillo', en_curso:'badge-azul', completado:'badge-verde', cancelado:'badge-rojo', borrador:'badge-gris', confirmada:'badge-azul', pagada:'badge-verde' };
+  return `<span class="badge ${m[e]||'badge-gris'}">${e.replace('_',' ')}</span>`;
+};
+
+const vacioHTML = msg => `<tr><td colspan="20"><div class="vacio"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p>${msg}</p></div></td></tr>`;
+const cargandoHTML = () => `<tr><td colspan="20" style="text-align:center;padding:32px;color:var(--gris)">Cargando...</td></tr>`;
+
+let editandoId = null;
+
+// ── Navegación ────────────────────────────────────────────────
+const titulos = { dashboard:'Dashboard', viajes:'Viajes', choferes:'Choferes', vehiculos:'Vehículos', clientes:'Clientes', proveedores:'Proveedores', productos:'Productos', gastos:'Gastos', combustible:'Combustible', anticipos:'Anticipos', liquidaciones:'Liquidaciones', stock:'Stock', usuarios:'Usuarios' };
+
+function irA(sec) {
+  document.querySelectorAll('.seccion').forEach(s => s.classList.remove('activa'));
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('activo'));
+  $(`sec-${sec}`).classList.add('activa');
+  event?.currentTarget?.classList.add('activo');
+  $('topbar-titulo').textContent = titulos[sec] || sec;
+
+  const loaders = { dashboard: cargarDashboard, viajes: cargarViajes, choferes: cargarChoferes, vehiculos: cargarVehiculos, clientes: cargarClientes, proveedores: cargarProveedores, productos: cargarProductos, gastos: cargarGastos, combustible: cargarCombustible, anticipos: cargarAnticipos, liquidaciones: cargarLiquidaciones, stock: cargarStockActual, usuarios: cargarUsuarios };
+  if (loaders[sec]) loaders[sec]();
+}
+
+function cerrarSesion() {
+  localStorage.removeItem('fn_token');
+  localStorage.removeItem('fn_usuario');
+  window.location.href = '/login.html';
+}
+
+// ── Modales ───────────────────────────────────────────────────
+function abrirModal(id) { $(id).classList.add('abierto'); }
+function cerrarModal(id) { $(id).classList.remove('abierto'); editandoId = null; }
+document.querySelectorAll('.modal-bg').forEach(m => {
+  m.addEventListener('click', e => { if (e.target === m) cerrarModal(m.id); });
+});
+function mostrarError(id, msg) { const el = $(id); el.textContent = msg; el.classList.add('visible'); }
+function limpiarError(id) { const el = $(id); el.textContent = ''; el.classList.remove('visible'); }
+
+// ══════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════════════════════════
+async function cargarDashboard() {
+  const r = await h('/dashboard');
+  if (!r.ok) return;
+  const d = r.data;
+
+  $('d-viajes-hoy').textContent  = d.viajes.hoy;
+  $('d-choferes').textContent    = d.choferes.activos;
+  $('d-vehiculos').textContent   = d.vehiculos.activos;
+  $('d-facturado').textContent   = fm(d.viajes.mes_facturado);
+  $('d-gastos').textContent      = fm(d.gastos.mes_total);
+  $('d-anticipos').textContent   = fm(d.anticipos.pendientes_total);
+
+  const tb = $('dash-tabla-viajes');
+  if (!d.viajes.recientes.length) { tb.innerHTML = vacioHTML('Sin viajes recientes'); return; }
+  tb.innerHTML = d.viajes.recientes.map(v => `
+    <tr>
+      <td><strong>${v.numero}</strong></td>
+      <td class="td-gris">${fd(v.fecha)}</td>
+      <td>${v.chofer_nombre||'-'}</td>
+      <td>${v.origen||'-'} → ${v.destino||'-'}</td>
+      <td>${v.cliente_nombre||'-'}</td>
+      <td>${fm(v.importe_flete)}</td>
+      <td>${estadoBadge(v.estado)}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CHOFERES
+// ══════════════════════════════════════════════════════════════
+async function cargarChoferes() {
+  const buscar = $('choferes-buscar')?.value || '';
+  const tb = $('choferes-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h(`/choferes?activo=true${buscar ? '&buscar='+buscar : ''}`);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay choferes'); return; }
+  tb.innerHTML = r.data.map(c => `
+    <tr>
+      <td><strong>${c.nombre}</strong></td>
+      <td class="td-gris">${c.dni}</td>
+      <td>${c.telefono||'-'}</td>
+      <td>${c.licencia||'-'}</td>
+      <td>${c.vencimiento_licencia ? fd(c.vencimiento_licencia) : '-'}</td>
+      <td>${c.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarChofer(${c.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarChofer(${c.id})">Baja</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalChofer() {
+  editandoId = null;
+  $('modal-chofer-titulo').textContent = 'Nuevo Chofer';
+  ['ch-nombre','ch-dni','ch-tel','ch-lic','ch-venc'].forEach(id => $(id).value = '');
+  limpiarError('err-chofer');
+  abrirModal('modal-chofer');
+}
+
+async function editarChofer(id) {
+  const r = await h(`/choferes/${id}`);
+  if (!r.ok) return;
+  const c = r.data;
+  editandoId = id;
+  $('modal-chofer-titulo').textContent = 'Editar Chofer';
+  $('ch-nombre').value = c.nombre || '';
+  $('ch-dni').value    = c.dni    || '';
+  $('ch-tel').value    = c.telefono || '';
+  $('ch-lic').value    = c.licencia || '';
+  $('ch-venc').value   = c.vencimiento_licencia || '';
+  limpiarError('err-chofer');
+  abrirModal('modal-chofer');
+}
+
+async function guardarChofer() {
+  limpiarError('err-chofer');
+  const body = { nombre: $('ch-nombre').value, dni: $('ch-dni').value, telefono: $('ch-tel').value, licencia: $('ch-lic').value, vencimiento_licencia: $('ch-venc').value };
+  if (!body.nombre || !body.dni) return mostrarError('err-chofer', 'Nombre y DNI son requeridos');
+  const url    = editandoId ? `/choferes/${editandoId}` : '/choferes';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-chofer', r.error);
+  cerrarModal('modal-chofer');
+  cargarChoferes();
+}
+
+async function eliminarChofer(id) {
+  if (!confirm('¿Dar de baja este chofer?')) return;
+  await h(`/choferes/${id}`, { method: 'DELETE' });
+  cargarChoferes();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  VEHÍCULOS
+// ══════════════════════════════════════════════════════════════
+async function cargarVehiculos() {
+  const buscar = $('vehiculos-buscar')?.value || '';
+  const tb = $('vehiculos-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h(`/vehiculos?activo=true${buscar ? '&buscar='+buscar : ''}`);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay vehículos'); return; }
+  tb.innerHTML = r.data.map(v => `
+    <tr>
+      <td><strong>${v.patente}</strong></td>
+      <td>${v.marca||'-'}</td>
+      <td>${v.modelo||'-'}</td>
+      <td>${v.anio||'-'}</td>
+      <td>${v.tipo||'-'}</td>
+      <td>${v.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarVehiculo(${v.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarVehiculo(${v.id})">Baja</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalVehiculo() {
+  editandoId = null;
+  $('modal-vehiculo-titulo').textContent = 'Nuevo Vehículo';
+  ['ve-patente','ve-marca','ve-modelo','ve-anio'].forEach(id => $(id).value = '');
+  $('ve-tipo').value = 'camion';
+  limpiarError('err-vehiculo');
+  abrirModal('modal-vehiculo');
+}
+
+async function editarVehiculo(id) {
+  const r = await h(`/vehiculos/${id}`);
+  if (!r.ok) return;
+  const v = r.data;
+  editandoId = id;
+  $('modal-vehiculo-titulo').textContent = 'Editar Vehículo';
+  $('ve-patente').value = v.patente || '';
+  $('ve-marca').value   = v.marca   || '';
+  $('ve-modelo').value  = v.modelo  || '';
+  $('ve-anio').value    = v.anio    || '';
+  $('ve-tipo').value    = v.tipo    || 'camion';
+  limpiarError('err-vehiculo');
+  abrirModal('modal-vehiculo');
+}
+
+async function guardarVehiculo() {
+  limpiarError('err-vehiculo');
+  const body = { patente: $('ve-patente').value, marca: $('ve-marca').value, modelo: $('ve-modelo').value, anio: $('ve-anio').value, tipo: $('ve-tipo').value };
+  if (!body.patente) return mostrarError('err-vehiculo', 'La patente es requerida');
+  const url    = editandoId ? `/vehiculos/${editandoId}` : '/vehiculos';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-vehiculo', r.error);
+  cerrarModal('modal-vehiculo');
+  cargarVehiculos();
+}
+
+async function eliminarVehiculo(id) {
+  if (!confirm('¿Dar de baja este vehículo?')) return;
+  await h(`/vehiculos/${id}`, { method: 'DELETE' });
+  cargarVehiculos();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  CLIENTES
+// ══════════════════════════════════════════════════════════════
+async function cargarClientes() {
+  const buscar = $('clientes-buscar')?.value || '';
+  const tb = $('clientes-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h(`/clientes?activo=true${buscar ? '&buscar='+buscar : ''}`);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay clientes'); return; }
+  tb.innerHTML = r.data.map(c => `
+    <tr>
+      <td><strong>${c.razon_social}</strong></td>
+      <td class="td-gris">${c.cuit||'-'}</td>
+      <td>${c.telefono||'-'}</td>
+      <td>${c.email||'-'}</td>
+      <td>${c.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarCliente(${c.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarCliente(${c.id})">Baja</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalCliente() {
+  editandoId = null;
+  $('modal-cliente-titulo').textContent = 'Nuevo Cliente';
+  ['cl-razon','cl-cuit','cl-tel','cl-email','cl-dir'].forEach(id => $(id).value = '');
+  limpiarError('err-cliente');
+  abrirModal('modal-cliente');
+}
+
+async function editarCliente(id) {
+  const r = await h(`/clientes/${id}`);
+  if (!r.ok) return;
+  const c = r.data;
+  editandoId = id;
+  $('modal-cliente-titulo').textContent = 'Editar Cliente';
+  $('cl-razon').value = c.razon_social || '';
+  $('cl-cuit').value  = c.cuit         || '';
+  $('cl-tel').value   = c.telefono     || '';
+  $('cl-email').value = c.email        || '';
+  $('cl-dir').value   = c.direccion    || '';
+  limpiarError('err-cliente');
+  abrirModal('modal-cliente');
+}
+
+async function guardarCliente() {
+  limpiarError('err-cliente');
+  const body = { razon_social: $('cl-razon').value, cuit: $('cl-cuit').value, telefono: $('cl-tel').value, email: $('cl-email').value, direccion: $('cl-dir').value };
+  if (!body.razon_social) return mostrarError('err-cliente', 'La razón social es requerida');
+  const url    = editandoId ? `/clientes/${editandoId}` : '/clientes';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-cliente', r.error);
+  cerrarModal('modal-cliente');
+  cargarClientes();
+}
+
+async function eliminarCliente(id) {
+  if (!confirm('¿Dar de baja este cliente?')) return;
+  await h(`/clientes/${id}`, { method: 'DELETE' });
+  cargarClientes();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PROVEEDORES
+// ══════════════════════════════════════════════════════════════
+async function cargarProveedores() {
+  const buscar = $('proveedores-buscar')?.value || '';
+  const tb = $('proveedores-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h(`/proveedores?activo=true${buscar ? '&buscar='+buscar : ''}`);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay proveedores'); return; }
+  tb.innerHTML = r.data.map(p => `
+    <tr>
+      <td><strong>${p.razon_social}</strong></td>
+      <td class="td-gris">${p.cuit||'-'}</td>
+      <td>${p.telefono||'-'}</td>
+      <td>${p.rubro||'-'}</td>
+      <td>${p.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarProveedor(${p.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarProveedor(${p.id})">Baja</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalProveedor() {
+  editandoId = null;
+  $('modal-proveedor-titulo').textContent = 'Nuevo Proveedor';
+  ['pv-razon','pv-cuit','pv-tel','pv-email','pv-rubro'].forEach(id => $(id).value = '');
+  limpiarError('err-proveedor');
+  abrirModal('modal-proveedor');
+}
+
+async function editarProveedor(id) {
+  const r = await h(`/proveedores/${id}`);
+  if (!r.ok) return;
+  const p = r.data;
+  editandoId = id;
+  $('modal-proveedor-titulo').textContent = 'Editar Proveedor';
+  $('pv-razon').value = p.razon_social || '';
+  $('pv-cuit').value  = p.cuit         || '';
+  $('pv-tel').value   = p.telefono     || '';
+  $('pv-email').value = p.email        || '';
+  $('pv-rubro').value = p.rubro        || '';
+  limpiarError('err-proveedor');
+  abrirModal('modal-proveedor');
+}
+
+async function guardarProveedor() {
+  limpiarError('err-proveedor');
+  const body = { razon_social: $('pv-razon').value, cuit: $('pv-cuit').value, telefono: $('pv-tel').value, email: $('pv-email').value, rubro: $('pv-rubro').value };
+  if (!body.razon_social) return mostrarError('err-proveedor', 'La razón social es requerida');
+  const url    = editandoId ? `/proveedores/${editandoId}` : '/proveedores';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-proveedor', r.error);
+  cerrarModal('modal-proveedor');
+  cargarProveedores();
+}
+
+async function eliminarProveedor(id) {
+  if (!confirm('¿Dar de baja este proveedor?')) return;
+  await h(`/proveedores/${id}`, { method: 'DELETE' });
+  cargarProveedores();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PRODUCTOS
+// ══════════════════════════════════════════════════════════════
+async function cargarProductos() {
+  const buscar = $('productos-buscar')?.value || '';
+  const tb = $('productos-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h(`/productos?activo=true${buscar ? '&buscar='+buscar : ''}`);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay productos'); return; }
+  tb.innerHTML = r.data.map(p => `
+    <tr>
+      <td><strong>${p.nombre}</strong></td>
+      <td>${p.unidad}</td>
+      <td class="td-gris">${p.descripcion||'-'}</td>
+      <td>${p.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarProducto(${p.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarProducto(${p.id})">Baja</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalProducto() {
+  editandoId = null;
+  $('modal-producto-titulo').textContent = 'Nuevo Producto';
+  ['pr-nombre','pr-desc'].forEach(id => $(id).value = '');
+  $('pr-unidad').value = 'kg';
+  limpiarError('err-producto');
+  abrirModal('modal-producto');
+}
+
+async function editarProducto(id) {
+  const r = await h(`/productos/${id}`);
+  if (!r.ok) return;
+  const p = r.data;
+  editandoId = id;
+  $('modal-producto-titulo').textContent = 'Editar Producto';
+  $('pr-nombre').value = p.nombre      || '';
+  $('pr-unidad').value = p.unidad      || 'kg';
+  $('pr-desc').value   = p.descripcion || '';
+  limpiarError('err-producto');
+  abrirModal('modal-producto');
+}
+
+async function guardarProducto() {
+  limpiarError('err-producto');
+  const body = { nombre: $('pr-nombre').value, unidad: $('pr-unidad').value, descripcion: $('pr-desc').value };
+  if (!body.nombre) return mostrarError('err-producto', 'El nombre es requerido');
+  const url    = editandoId ? `/productos/${editandoId}` : '/productos';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-producto', r.error);
+  cerrarModal('modal-producto');
+  cargarProductos();
+}
+
+async function eliminarProducto(id) {
+  if (!confirm('¿Dar de baja este producto?')) return;
+  await h(`/productos/${id}`, { method: 'DELETE' });
+  cargarProductos();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  VIAJES
+// ══════════════════════════════════════════════════════════════
+async function cargarViajes() {
+  const buscar = $('viajes-buscar')?.value || '';
+  const estado = $('viajes-estado')?.value || '';
+  const tb = $('viajes-tabla');
+  tb.innerHTML = cargandoHTML();
+  let url = '/viajes?';
+  if (buscar) url += `buscar=${buscar}&`;
+  if (estado) url += `estado=${estado}&`;
+  const r = await h(url);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay viajes'); return; }
+  tb.innerHTML = r.data.map(v => `
+    <tr>
+      <td><strong>${v.numero}</strong></td>
+      <td class="td-gris">${fd(v.fecha)}</td>
+      <td>${v.chofer_nombre||'-'}</td>
+      <td>${v.vehiculo_patente||'-'}</td>
+      <td>${v.origen||'-'} → ${v.destino||'-'}</td>
+      <td>${v.cliente_nombre||'-'}</td>
+      <td>${fm(v.importe_flete)}</td>
+      <td>${estadoBadge(v.estado)}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="editarViaje(${v.id})">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarViaje(${v.id})">Eliminar</button>
+      </td>
+    </tr>`).join('');
+}
+
+function filtrarViajes() { cargarViajes(); }
+
+async function abrirModalViaje() {
+  editandoId = null;
+  $('modal-viaje-titulo').textContent = 'Nuevo Viaje';
+  ['vj-origen','vj-destino','vj-km-est','vj-km-real','vj-peso','vj-importe','vj-obs'].forEach(id => $(id).value = '');
+  $('vj-fecha').value  = new Date().toISOString().split('T')[0];
+  $('vj-estado').value = 'pendiente';
+  limpiarError('err-viaje');
+  await cargarSelectsViaje();
+  abrirModal('modal-viaje');
+}
+
+async function cargarSelectsViaje() {
+  const [ch, ve, cl, pr] = await Promise.all([
+    h('/choferes?activo=true'), h('/vehiculos?activo=true'), h('/clientes?activo=true'), h('/productos?activo=true')
+  ]);
+  const opts = (arr, campo) => arr.data?.map(i => `<option value="${i.id}">${i[campo]}</option>`).join('') || '';
+  $('vj-chofer').innerHTML  = '<option value="">Seleccionar...</option>'  + opts(ch, 'nombre');
+  $('vj-vehiculo').innerHTML = '<option value="">Seleccionar...</option>' + opts(ve, 'patente');
+  $('vj-cliente').innerHTML  = '<option value="">Seleccionar...</option>'  + opts(cl, 'razon_social');
+  $('vj-producto').innerHTML = '<option value="">Sin producto</option>'    + opts(pr, 'nombre');
+}
+
+async function editarViaje(id) {
+  const r = await h(`/viajes/${id}`);
+  if (!r.ok) return;
+  const v = r.data;
+  editandoId = id;
+  $('modal-viaje-titulo').textContent = `Editar Viaje ${v.numero}`;
+  await cargarSelectsViaje();
+  $('vj-fecha').value   = v.fecha   || '';
+  $('vj-estado').value  = v.estado  || 'pendiente';
+  $('vj-chofer').value  = v.chofer_id  || '';
+  $('vj-vehiculo').value = v.vehiculo_id || '';
+  $('vj-cliente').value = v.cliente_id || '';
+  $('vj-producto').value = v.producto_id || '';
+  $('vj-origen').value  = v.origen  || '';
+  $('vj-destino').value = v.destino || '';
+  $('vj-km-est').value  = v.km_estimados || '';
+  $('vj-km-real').value = v.km_reales    || '';
+  $('vj-peso').value    = v.peso_carga   || '';
+  $('vj-importe').value = v.importe_flete || '';
+  $('vj-obs').value     = v.observaciones || '';
+  limpiarError('err-viaje');
+  abrirModal('modal-viaje');
+}
+
+async function guardarViaje() {
+  limpiarError('err-viaje');
+  const body = {
+    fecha: $('vj-fecha').value, chofer_id: $('vj-chofer').value,
+    vehiculo_id: $('vj-vehiculo').value, cliente_id: $('vj-cliente').value,
+    producto_id: $('vj-producto').value || null,
+    origen: $('vj-origen').value, destino: $('vj-destino').value,
+    km_estimados: $('vj-km-est').value || null, km_reales: $('vj-km-real').value || null,
+    peso_carga: $('vj-peso').value || null, importe_flete: $('vj-importe').value || null,
+    estado: $('vj-estado').value, observaciones: $('vj-obs').value || null
+  };
+  if (!body.fecha || !body.chofer_id || !body.vehiculo_id || !body.cliente_id)
+    return mostrarError('err-viaje', 'Fecha, chofer, vehículo y cliente son requeridos');
+  const url    = editandoId ? `/viajes/${editandoId}` : '/viajes';
+  const method = editandoId ? 'PUT' : 'POST';
+  const r = await h(url, { method, body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-viaje', r.error);
+  cerrarModal('modal-viaje');
+  cargarViajes();
+}
+
+async function eliminarViaje(id) {
+  if (!confirm('¿Eliminar este viaje?')) return;
+  const r = await h(`/viajes/${id}`, { method: 'DELETE' });
+  if (!r.ok) return alert(r.error);
+  cargarViajes();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  GASTOS
+// ══════════════════════════════════════════════════════════════
+async function cargarGastos() {
+  const buscar = $('gastos-buscar')?.value || '';
+  const cat    = $('gastos-cat')?.value    || '';
+  const tb = $('gastos-tabla');
+  tb.innerHTML = cargandoHTML();
+  let url = '/gastos?';
+  if (buscar) url += `buscar=${buscar}&`;
+  if (cat)    url += `categoria=${cat}&`;
+  const r = await h(url);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay gastos'); return; }
+  tb.innerHTML = r.data.map(g => `
+    <tr>
+      <td>${fd(g.fecha)}</td>
+      <td><span class="badge badge-gris">${g.categoria}</span></td>
+      <td>${g.chofer_nombre||'-'}</td>
+      <td>${g.viaje_numero||'-'}</td>
+      <td class="td-gris">${g.descripcion||'-'}</td>
+      <td><strong>${fm(g.importe)}</strong></td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="eliminarGasto(${g.id})">Eliminar</button>
+      </td>
+    </tr>`).join('');
+}
+
+async function abrirModalGasto() {
+  $('gs-fecha').value = new Date().toISOString().split('T')[0];
+  $('gs-cat').value   = 'combustible';
+  ['gs-desc','gs-importe'].forEach(id => $(id).value = '');
+  limpiarError('err-gasto');
+  const [ch, vj] = await Promise.all([h('/choferes?activo=true'), h('/viajes?estado=en_curso')]);
+  $('gs-chofer').innerHTML = '<option value="">Sin chofer</option>' + (ch.data?.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') || '');
+  $('gs-viaje').innerHTML  = '<option value="">Sin viaje</option>'  + (vj.data?.map(v => `<option value="${v.id}">${v.numero} - ${v.origen} → ${v.destino}</option>`).join('') || '');
+  abrirModal('modal-gasto');
+}
+
+async function guardarGasto() {
+  limpiarError('err-gasto');
+  const body = { fecha: $('gs-fecha').value, categoria: $('gs-cat').value, chofer_id: $('gs-chofer').value || null, viaje_id: $('gs-viaje').value || null, descripcion: $('gs-desc').value, importe: $('gs-importe').value };
+  if (!body.fecha || !body.categoria || !body.importe) return mostrarError('err-gasto', 'Fecha, categoría e importe son requeridos');
+  const r = await h('/gastos', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-gasto', r.error);
+  cerrarModal('modal-gasto');
+  cargarGastos();
+}
+
+async function eliminarGasto(id) {
+  if (!confirm('¿Eliminar este gasto?')) return;
+  await h(`/gastos/${id}`, { method: 'DELETE' });
+  cargarGastos();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  COMBUSTIBLE
+// ══════════════════════════════════════════════════════════════
+async function cargarCombustible() {
+  const tb = $('combustible-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h('/combustible');
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay registros de combustible'); return; }
+  tb.innerHTML = r.data.map(c => `
+    <tr>
+      <td>${fd(c.fecha)}</td>
+      <td><strong>${c.vehiculo_patente||'-'}</strong></td>
+      <td>${c.viaje_numero||'-'}</td>
+      <td>${c.estacion||'-'}</td>
+      <td>${c.litros} lt</td>
+      <td>${fm(c.precio_litro)}</td>
+      <td><strong>${fm(c.total)}</strong></td>
+      <td><button class="btn btn-danger btn-sm" onclick="eliminarCombustible(${c.id})">Eliminar</button></td>
+    </tr>`).join('');
+}
+
+function calcularTotalComb() {
+  const l = parseFloat($('cb-litros').value) || 0;
+  const p = parseFloat($('cb-precio').value) || 0;
+  $('cb-total').value = l && p ? (l * p).toFixed(2) : '';
+}
+
+async function abrirModalCombustible() {
+  $('cb-fecha').value = new Date().toISOString().split('T')[0];
+  ['cb-litros','cb-precio','cb-total','cb-estacion'].forEach(id => $(id).value = '');
+  limpiarError('err-combustible');
+  const [ve, vj] = await Promise.all([h('/vehiculos?activo=true'), h('/viajes?estado=en_curso')]);
+  $('cb-vehiculo').innerHTML = '<option value="">Seleccionar...</option>' + (ve.data?.map(v => `<option value="${v.id}">${v.patente} - ${v.marca||''} ${v.modelo||''}</option>`).join('') || '');
+  $('cb-viaje').innerHTML    = '<option value="">Sin viaje</option>'      + (vj.data?.map(v => `<option value="${v.id}">${v.numero} - ${v.origen} → ${v.destino}</option>`).join('') || '');
+  abrirModal('modal-combustible');
+}
+
+async function guardarCombustible() {
+  limpiarError('err-combustible');
+  const body = { vehiculo_id: $('cb-vehiculo').value, viaje_id: $('cb-viaje').value || null, fecha: $('cb-fecha').value, litros: $('cb-litros').value, precio_litro: $('cb-precio').value, estacion: $('cb-estacion').value || null };
+  if (!body.vehiculo_id || !body.fecha || !body.litros || !body.precio_litro) return mostrarError('err-combustible', 'Vehículo, fecha, litros y precio son requeridos');
+  const r = await h('/combustible', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-combustible', r.error);
+  cerrarModal('modal-combustible');
+  cargarCombustible();
+}
+
+async function eliminarCombustible(id) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  await h(`/combustible/${id}`, { method: 'DELETE' });
+  cargarCombustible();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  ANTICIPOS
+// ══════════════════════════════════════════════════════════════
+async function cargarAnticipos() {
+  const liq = $('anticipos-liq')?.value || '';
+  const tb = $('anticipos-tabla');
+  tb.innerHTML = cargandoHTML();
+  const url = liq ? `/anticipos?liquidado=${liq}` : '/anticipos';
+  const r = await h(url);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay anticipos'); return; }
+  tb.innerHTML = r.data.map(a => `
+    <tr>
+      <td>${fd(a.fecha)}</td>
+      <td><strong>${a.chofer_nombre||'-'}</strong></td>
+      <td>${a.viaje_numero||'-'}</td>
+      <td class="td-gris">${a.descripcion||'-'}</td>
+      <td><strong>${fm(a.importe)}</strong></td>
+      <td>${a.liquidado ? '<span class="badge badge-verde">Liquidado</span>' : '<span class="badge badge-amarillo">Pendiente</span>'}</td>
+      <td>
+        ${!a.liquidado ? `<button class="btn btn-success btn-sm" onclick="liquidarAnticipo(${a.id})">Liquidar</button>` : ''}
+        ${!a.liquidado ? `<button class="btn btn-danger btn-sm" onclick="eliminarAnticipo(${a.id})">Eliminar</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+async function abrirModalAnticipo() {
+  $('an-fecha').value = new Date().toISOString().split('T')[0];
+  ['an-importe','an-desc'].forEach(id => $(id).value = '');
+  limpiarError('err-anticipo');
+  const [ch, vj] = await Promise.all([h('/choferes?activo=true'), h('/viajes?estado=en_curso')]);
+  $('an-chofer').innerHTML = '<option value="">Seleccionar...</option>' + (ch.data?.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') || '');
+  $('an-viaje').innerHTML  = '<option value="">Sin viaje</option>'      + (vj.data?.map(v => `<option value="${v.id}">${v.numero} - ${v.origen} → ${v.destino}</option>`).join('') || '');
+  abrirModal('modal-anticipo');
+}
+
+async function guardarAnticipo() {
+  limpiarError('err-anticipo');
+  const body = { chofer_id: $('an-chofer').value, viaje_id: $('an-viaje').value || null, fecha: $('an-fecha').value, importe: $('an-importe').value, descripcion: $('an-desc').value || null };
+  if (!body.chofer_id || !body.fecha || !body.importe) return mostrarError('err-anticipo', 'Chofer, fecha e importe son requeridos');
+  const r = await h('/anticipos', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-anticipo', r.error);
+  cerrarModal('modal-anticipo');
+  cargarAnticipos();
+}
+
+async function liquidarAnticipo(id) {
+  if (!confirm('¿Marcar este anticipo como liquidado?')) return;
+  await h(`/anticipos/${id}/liquidar`, { method: 'PATCH', body: JSON.stringify({}) });
+  cargarAnticipos();
+}
+
+async function eliminarAnticipo(id) {
+  if (!confirm('¿Eliminar este anticipo?')) return;
+  await h(`/anticipos/${id}`, { method: 'DELETE' });
+  cargarAnticipos();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  LIQUIDACIONES
+// ══════════════════════════════════════════════════════════════
+async function cargarLiquidaciones() {
+  const estado = $('liq-estado')?.value || '';
+  const tb = $('liquidaciones-tabla');
+  tb.innerHTML = cargandoHTML();
+  const url = estado ? `/liquidaciones?estado=${estado}` : '/liquidaciones';
+  const r = await h(url);
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay liquidaciones'); return; }
+  tb.innerHTML = r.data.map(l => `
+    <tr>
+      <td><strong>${l.numero}</strong></td>
+      <td>${l.chofer_nombre||'-'}</td>
+      <td class="td-gris">${fd(l.fecha_desde)} — ${fd(l.fecha_hasta)}</td>
+      <td>${fm(l.total_fletes)}</td>
+      <td>${l.porcentaje}%</td>
+      <td>${fm(l.importe_bruto)}</td>
+      <td>${fm(Number(l.total_anticipos)+Number(l.total_gastos))}</td>
+      <td><strong>${fm(l.importe_neto)}</strong></td>
+      <td>${estadoBadge(l.estado)}</td>
+      <td>
+        ${l.estado !== 'pagada' ? `<button class="btn btn-success btn-sm" onclick="cambiarEstadoLiq(${l.id},'confirmada')">Confirmar</button>` : ''}
+        ${l.estado === 'confirmada' ? `<button class="btn btn-primary btn-sm" onclick="cambiarEstadoLiq(${l.id},'pagada')">Pagar</button>` : ''}
+        ${l.estado !== 'pagada' ? `<button class="btn btn-danger btn-sm" onclick="eliminarLiquidacion(${l.id})">Eliminar</button>` : ''}
+      </td>
+    </tr>`).join('');
+}
+
+async function abrirModalLiquidacion() {
+  ['lq-desde','lq-hasta','lq-obs'].forEach(id => $(id).value = '');
+  $('lq-porc').value = '30';
+  $('lq-viajes-lista').innerHTML = '<span style="color:var(--gris)">Seleccione chofer y período primero</span>';
+  limpiarError('err-liq');
+  const ch = await h('/choferes?activo=true');
+  $('lq-chofer').innerHTML = '<option value="">Seleccionar...</option>' + (ch.data?.map(c => `<option value="${c.id}">${c.nombre}</option>`).join('') || '');
+  abrirModal('modal-liquidacion');
+}
+
+let viajesSeleccionados = [];
+
+async function buscarViajesLiquidacion() {
+  const choferId = $('lq-chofer').value;
+  const desde    = $('lq-desde').value;
+  const hasta    = $('lq-hasta').value;
+  if (!choferId || !desde || !hasta) {
+    $('lq-viajes-lista').innerHTML = '<span style="color:var(--rojo)">Complete chofer y período primero</span>';
+    return;
+  }
+  const r = await h(`/viajes?chofer_id=${choferId}&desde=${desde}&hasta=${hasta}&estado=completado`);
+  viajesSeleccionados = [];
+  if (!r.ok || !r.data.length) {
+    $('lq-viajes-lista').innerHTML = '<span style="color:var(--gris)">No hay viajes completados en ese período</span>';
+    return;
+  }
+  $('lq-viajes-lista').innerHTML = r.data.map(v => `
+    <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer">
+      <input type="checkbox" value="${v.id}" onchange="toggleViajeSelect(this,${v.id})" checked>
+      <span>${v.numero} — ${fd(v.fecha)} — ${v.origen||''} → ${v.destino||''} — ${fm(v.importe_flete)}</span>
+    </label>`).join('');
+  viajesSeleccionados = r.data.map(v => v.id);
+}
+
+function toggleViajeSelect(el, id) {
+  if (el.checked) { if (!viajesSeleccionados.includes(id)) viajesSeleccionados.push(id); }
+  else { viajesSeleccionados = viajesSeleccionados.filter(i => i !== id); }
+}
+
+async function guardarLiquidacion() {
+  limpiarError('err-liq');
+  const body = { chofer_id: $('lq-chofer').value, fecha_desde: $('lq-desde').value, fecha_hasta: $('lq-hasta').value, porcentaje: $('lq-porc').value, viajes_ids: viajesSeleccionados, observaciones: $('lq-obs').value || null };
+  if (!body.chofer_id || !body.fecha_desde || !body.fecha_hasta || !body.porcentaje) return mostrarError('err-liq', 'Todos los campos son requeridos');
+  if (!body.viajes_ids.length) return mostrarError('err-liq', 'Debe seleccionar al menos un viaje');
+  const r = await h('/liquidaciones', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-liq', r.error);
+  cerrarModal('modal-liquidacion');
+  cargarLiquidaciones();
+}
+
+async function cambiarEstadoLiq(id, estado) {
+  if (!confirm(`¿Marcar como ${estado}?`)) return;
+  await h(`/liquidaciones/${id}/estado`, { method: 'PATCH', body: JSON.stringify({ estado }) });
+  cargarLiquidaciones();
+}
+
+async function eliminarLiquidacion(id) {
+  if (!confirm('¿Eliminar esta liquidación? Se revertirán los anticipos.')) return;
+  await h(`/liquidaciones/${id}`, { method: 'DELETE' });
+  cargarLiquidaciones();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  STOCK
+// ══════════════════════════════════════════════════════════════
+async function cargarStockActual() {
+  const tb = $('stock-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h('/stock/actual');
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay productos en stock'); return; }
+  tb.innerHTML = r.data.map(s => `
+    <tr>
+      <td><strong>${s.nombre}</strong></td>
+      <td>${s.unidad}</td>
+      <td>${s.entradas}</td>
+      <td>${s.salidas}</td>
+      <td>${s.disponible <= 0 ? `<span class="badge badge-rojo">${s.disponible}</span>` : `<span class="badge badge-verde">${s.disponible}</span>`}</td>
+      <td>${s.precio_promedio > 0 ? fm(s.precio_promedio) : '-'}</td>
+    </tr>`).join('');
+}
+
+async function abrirModalStock() {
+  $('sk-fecha').value = new Date().toISOString().split('T')[0];
+  ['sk-cantidad','sk-precio','sk-ref'].forEach(id => $(id).value = '');
+  $('sk-tipo').value = 'entrada';
+  limpiarError('err-stock');
+  const [pr, pv] = await Promise.all([h('/productos?activo=true'), h('/proveedores?activo=true')]);
+  $('sk-producto').innerHTML  = '<option value="">Seleccionar...</option>' + (pr.data?.map(p => `<option value="${p.id}">${p.nombre} (${p.unidad})</option>`).join('') || '');
+  $('sk-proveedor').innerHTML = '<option value="">Sin proveedor</option>'   + (pv.data?.map(p => `<option value="${p.id}">${p.razon_social}</option>`).join('') || '');
+  abrirModal('modal-stock');
+}
+
+async function guardarStock() {
+  limpiarError('err-stock');
+  const body = { producto_id: $('sk-producto').value, proveedor_id: $('sk-proveedor').value || null, fecha: $('sk-fecha').value, tipo: $('sk-tipo').value, cantidad: $('sk-cantidad').value, precio_unitario: $('sk-precio').value || null, referencia: $('sk-ref').value || null };
+  if (!body.producto_id || !body.fecha || !body.tipo || !body.cantidad) return mostrarError('err-stock', 'Producto, fecha, tipo y cantidad son requeridos');
+  const r = await h('/stock', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-stock', r.error);
+  cerrarModal('modal-stock');
+  cargarStockActual();
+}
+
+// ══════════════════════════════════════════════════════════════
+//  USUARIOS
+// ══════════════════════════════════════════════════════════════
+async function cargarUsuarios() {
+  const tb = $('usuarios-tabla');
+  tb.innerHTML = cargandoHTML();
+  const r = await h('/usuarios');
+  if (!r.ok || !r.data.length) { tb.innerHTML = vacioHTML('No hay usuarios'); return; }
+  tb.innerHTML = r.data.map(u => `
+    <tr>
+      <td><strong>${u.nombre}</strong></td>
+      <td>${u.email}</td>
+      <td><span class="badge ${u.rol==='admin'?'badge-azul':u.rol==='operador'?'badge-verde':'badge-gris'}">${u.rol}</span></td>
+      <td>${u.activo ? '<span class="badge badge-verde">Activo</span>' : '<span class="badge badge-rojo">Inactivo</span>'}</td>
+      <td class="td-gris">${fd(u.creado_en?.split(' ')[0])}</td>
+      <td>
+        <button class="btn btn-secondary btn-sm" onclick="toggleUsuario(${u.id})">${u.activo?'Desactivar':'Activar'}</button>
+      </td>
+    </tr>`).join('');
+}
+
+function abrirModalUsuario() {
+  $('modal-usuario-titulo').textContent = 'Nuevo Usuario';
+  ['us-nombre','us-email','us-pass'].forEach(id => $(id).value = '');
+  $('us-rol').value = 'operador';
+  limpiarError('err-usuario');
+  abrirModal('modal-usuario');
+}
+
+async function guardarUsuario() {
+  limpiarError('err-usuario');
+  const body = { nombre: $('us-nombre').value, email: $('us-email').value, password: $('us-pass').value, rol: $('us-rol').value };
+  if (!body.nombre || !body.email || !body.password) return mostrarError('err-usuario', 'Nombre, email y contraseña son requeridos');
+  const r = await h('/usuarios', { method: 'POST', body: JSON.stringify(body) });
+  if (!r.ok) return mostrarError('err-usuario', r.error);
+  cerrarModal('modal-usuario');
+  cargarUsuarios();
+}
+
+async function toggleUsuario(id) {
+  await h(`/usuarios/${id}/activar`, { method: 'PATCH', body: JSON.stringify({}) });
+  cargarUsuarios();
+}
+
+// ── Arranque ──────────────────────────────────────────────────
+cargarDashboard();
+</script>
+</body>
+</html>
