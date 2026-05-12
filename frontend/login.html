@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FleteNet — Iniciar Sesión</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1a56db 0%, #1e3a8a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .contenedor {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    /* ── Logo ── */
+    .logo {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .logo-icono {
+      width: 72px;
+      height: 72px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .logo-icono svg {
+      width: 40px;
+      height: 40px;
+      fill: #ffffff;
+    }
+    .logo h1 {
+      font-size: 32px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: -0.5px;
+    }
+    .logo p {
+      font-size: 14px;
+      color: #bfdbfe;
+      margin-top: 4px;
+    }
+
+    /* ── Tarjeta ── */
+    .tarjeta {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.25);
+    }
+    .tarjeta h2 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+    .tarjeta p {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 28px;
+    }
+
+    /* ── Formulario ── */
+    .campo {
+      margin-bottom: 20px;
+    }
+    .campo label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 7px;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap svg {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: #9ca3af;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .campo input {
+      width: 100%;
+      padding: 12px 14px 12px 42px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: 15px;
+      color: #111827;
+      background: #f9fafb;
+      transition: all 0.2s;
+      outline: none;
+    }
+    .campo input:focus {
+      border-color: #1a56db;
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(26,86,219,0.1);
+    }
+    .campo input.error {
+      border-color: #ef4444;
+      background: #fff5f5;
+    }
+
+    /* Ojo contraseña */
+    .ojo {
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+      color: #9ca3af;
+    }
+    .ojo:hover { color: #374151; }
+    .ojo svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      position: static;
+      transform: none;
+    }
+
+    /* ── Botón ── */
+    .btn-ingresar {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #1a56db, #1e3a8a);
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-ingresar:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(26,86,219,0.35);
+    }
+    .btn-ingresar:active {
+      transform: translateY(0);
+    }
+    .btn-ingresar:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #ffffff;
+      border-radius: 50%;
+      animation: girar 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes girar { to { transform: rotate(360deg); } }
+
+    /* ── Alerta de error ── */
+    .alerta {
+      display: none;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 20px;
+      font-size: 14px;
+      color: #b91c1c;
+      align-items: center;
+      gap: 8px;
+    }
+    .alerta.visible { display: flex; }
+    .alerta svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      fill: none;
+      stroke: #b91c1c;
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    /* ── Info demo ── */
+    .demo-info {
+      margin-top: 24px;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .demo-info p {
+      font-size: 12px;
+      color: #1e40af;
+      margin: 0;
+      line-height: 1.5;
+    }
+    .demo-info strong { font-weight: 700; }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: #bfdbfe;
+    }
+  </style>
+</head>
+<body>
+
+<div class="contenedor">
+
+  <!-- Logo -->
+  <div class="logo">
+    <div class="logo-icono">
+      <!-- Camión SVG -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M1 3h15v13H1zM16 8h4l3 3v5h-7V8z"/>
+        <circle cx="5.5" cy="18.5" r="2.5"/>
+        <circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    </div>
+    <h1>FleteNet</h1>
+    <p>Sistema de Gestión de Fletes</p>
+  </div>
+
+  <!-- Tarjeta de login -->
+  <div class="tarjeta">
+    <h2>Bienvenido</h2>
+    <p>Ingresá tus credenciales para continuar</p>
+
+    <!-- Alerta de error -->
+    <div class="alerta" id="alerta">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      <span id="alerta-texto">Error al iniciar sesión</span>
+    </div>
+
+    <!-- Formulario -->
+    <div class="campo">
+      <label for="email">Correo electrónico</label>
+      <div class="input-wrap">
+        <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        <input
+          type="email"
+          id="email"
+          placeholder="admin@fletenet.com"
+          autocomplete="email"
+        />
+      </div>
+    </div>
+
+    <div class="campo">
+      <label for="password">Contraseña</label>
+      <div class="input-wrap">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <input
+          type="password"
+          id="password"
+          placeholder="••••••••"
+          autocomplete="current-password"
+        />
+        <button class="ojo" id="btn-ojo" type="button" title="Mostrar contraseña">
+          <svg id="icono-ojo" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-ingresar" id="btn-ingresar" type="button">
+      <div class="spinner" id="spinner"></div>
+      <span id="btn-texto">Ingresar al sistema</span>
+    </button>
+
+    <!-- Info demo -->
+    <div class="demo-info">
+      <p>
+        <strong>🔑 Acceso de prueba:</strong><br/>
+        Email: <strong>admin@fletenet.com</strong><br/>
+        Contraseña: <strong>admin123</strong>
+      </p>
+    </div>
+  </div>
+
+  <div class="footer">
+    FleteNet v1.0 &mdash; Gestión de Fletes
+  </div>
+
+</div>
+
+<script>
+  const API = 'http://localhost:3000/api';
+
+  const emailInput    = document.getElementById('email');
+  const passInput     = document.getElementById('password');
+  const btnIngresar   = document.getElementById('btn-ingresar');
+  const btnTexto      = document.getElementById('btn-texto');
+  const spinner       = document.getElementById('spinner');
+  const alerta        = document.getElementById('alerta');
+  const alertaTexto   = document.getElementById('alerta-texto');
+  const btnOjo        = document.getElementById('btn-ojo');
+
+  // ── Mostrar/ocultar contraseña ──────────────────────────────
+  btnOjo.addEventListener('click', () => {
+    const esPassword = passInput.type === 'password';
+    passInput.type   = esPassword ? 'text' : 'password';
+    btnOjo.title     = esPassword ? 'Ocultar contraseña' : 'Mostrar contraseña';
+  });
+
+  // ── Limpiar errores al escribir ─────────────────────────────
+  [emailInput, passInput].forEach(input => {
+    input.addEventListener('input', () => {
+      input.classList.remove('error');
+      alerta.classList.remove('visible');
+    });
+  });
+
+  // ── Enter para ingresar ─────────────────────────────────────
+  passInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') login();
+  });
+  emailInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') passInput.focus();
+  });
+
+  // ── Mostrar error ───────────────────────────────────────────
+  const mostrarError = (msg) => {
+    alertaTexto.textContent = msg;
+    alerta.classList.add('visible');
+    emailInput.classList.add('error');
+    passInput.classList.add('error');
+  };
+
+  // ── Cargando ────────────────────────────────────────────────
+  const setCargando = (estado) => {
+    btnIngresar.disabled = estado;
+    spinner.style.display  = estado ? 'block' : 'none';
+    btnTexto.textContent   = estado ? 'Verificando...' : 'Ingresar al sistema';
+  };
+
+  // ── Login ───────────────────────────────────────────────────
+  const login = async () => {
+    const email    = emailInput.value.trim();
+    const password = passInput.value.trim();
+
+    if (!email) {
+      mostrarError('Ingresá tu correo electrónico');
+      emailInput.focus();
+      return;
+    }
+    if (!password) {
+      mostrarError('Ingresá tu contraseña');
+      passInput.focus();
+      return;
+    }
+
+    setCargando(true);
+
+    try {
+      const resp = await fetch(`${API}/auth/login`, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ email, password })
+      });
+
+      const data = await resp.json();
+
+      if (!resp.ok) {
+        mostrarError(data.error || 'Credenciales incorrectas');
+        setCargando(false);
+        return;
+      }
+
+      // Guardar token y datos de usuario
+      localStorage.setItem('fn_token',   data.token);
+      localStorage.setItem('fn_usuario', JSON.stringify(data.usuario));
+
+      // Redirigir al panel principal
+      window.location.href = '/index.html';
+
+    } catch (err) {
+      mostrarError('No se pudo conectar con el servidor. ¿Está corriendo FleteNet?');
+      setCargando(false);
+    }
+  };
+
+  btnIngresar.addEventListener('click', login);
+
+  // ── Si ya hay sesión activa, redirigir ──────────────────────
+  const tokenGuardado = localStorage.getItem('fn_token');
+  if (tokenGuardado) {
+    window.location.href = '/index.html';
+  }
+</script>
+
+</body>
+</html>
